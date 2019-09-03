@@ -109,9 +109,11 @@
     }
     
     function start () {
+      clear()
       background(220)
       getAudioContext().resume()
       audio = true
+      count = 1
     }
 
     function createEffect () {
