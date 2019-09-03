@@ -3,8 +3,157 @@
   <head>
     <meta charset="utf-8">
     <title>P5.js Example</title>
+    <style>
+    
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 20px;
+        padding-left: 11.5px;
+        background-color: #dcdcdc;
+        box-sizing: border-box;
+      }
+
+      .footer input[type=checkbox] {
+        width: 20px;
+        margin: 0 3px;
+      }
+    
+    </style>
   </head>
   <body>
-    
+    <div class="footer">
+      <input type="checkbox" value="0" checked>
+      <input type="checkbox" value="1">
+      <input type="checkbox" value="2">
+      <input type="checkbox" value="3" checked>
+      <input type="checkbox" value="4">
+      <input type="checkbox" value="5">
+      <input type="checkbox" value="6">
+      <input type="checkbox" value="7" checked>
+    </div>
   </body>
+  <script src="./src/p5.min.js"></script>
+  <script src="./src/p5.sound.min.js"></script>
+  <script>
+
+    // 프레임 레이트 정하기
+    let fr = 8
+    let noise, env, analyzer
+    let audio = false
+
+    let steps = [0, 0, 0, 0, 0, 0, 0, 0]
+
+    window.onload = function () {
+      document.querySelectorAll('input[type=checkbox]').forEach((el, i) => {
+        steps[parseInt(el.value)] = el.checked ? 1 : 0
+        el.addEventListener('click', function () {
+          steps[parseInt(this.value)] = this.checked ? 1 : 0
+        })
+      })
+    }
+
+    function setup () {
+      createCanvas(windowWidth, windowHeight - 20)
+      
+      // 악기 세팅
+      noise = new p5.Noise()
+      noise.start()
+      noise.amp(0)
+      env = new p5.Envelope()
+      env.setADSR(0.001, 0.1, 0.2, 0.1)
+      env.setRange(1, 0)
+      
+      background(220)
+      
+      // 1초에 draw가 일정하게 몇번 실행될지
+      frameRate(fr)
+    }
+
+    function draw () {
+      if (!audio) {
+        textSize(30)
+        textAlign(CENTER)
+        text('Click to Start!', windowWidth / 2, windowHeight / 2)
+        return
+      }
+
+      // 1초마다 리셋
+      let step = frameCount % fr
+      
+      clear()
+      background(220)
+      
+      if (steps[step]) {
+        setRandomColor()
+        ellipse(random(windowWidth), random(windowHeight), 100, 100)
+        env.play(noise)
+      }
+
+      drawStepIcon(steps, step)
+
+      fill(0)
+      textSize(30)
+      text(step, 10, 35)
+    }
+
+    function mouseClicked () {
+      start()
+    }
+
+    function touchStarted () {
+      start()
+    }
+    
+    function start () {
+      getAudioContext().resume()
+      audio = true
+    }
+
+    function setRandomColor () {
+      let r = random(255)
+      let g = random(255)
+      let b = random(255)
+      fill(r, g, b)
+    }
+
+    function drawStepIcon (steps, step) {
+      let size = 20
+      let margin = 5
+
+      for (let i = 0; i < fr; i++) {
+        if (steps[i]) {
+          fill(100, 200, 255)
+        } else {
+          fill(255)
+        }
+
+        if (i === step) {
+          strokeWeight(2)
+        } else {
+          strokeWeight(1)
+        }
+
+        ellipseMode(CENTER)
+        ellipse(
+          i * 1.5 * size + margin + size,
+          windowHeight - margin - size * 2,
+          size,
+          size
+        )
+      }
+
+      strokeWeight(1)
+    }
+  
+  </script>
 </html>
