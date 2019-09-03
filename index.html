@@ -51,6 +51,8 @@
     let noise, env, analyzer
     let audio = false
 
+    let count = 1
+
     let steps = [0, 0, 0, 0, 0, 0, 0, 0]
 
     window.onload = function () {
@@ -90,20 +92,12 @@
       // 1초마다 리셋
       let step = frameCount % fr
       
-      clear()
-      background(220)
-      
       if (steps[step]) {
-        setRandomColor()
-        ellipse(random(windowWidth), random(windowHeight), 100, 100)
+        createEffect()
         env.play(noise)
       }
 
       drawStepIcon(steps, step)
-
-      fill(0)
-      textSize(30)
-      text(step, 10, 35)
     }
 
     function mouseClicked () {
@@ -115,8 +109,19 @@
     }
     
     function start () {
+      background(220)
       getAudioContext().resume()
       audio = true
+    }
+
+    function createEffect () {
+      let x = random(windowWidth)
+      let y = random(windowHeight)
+      let size = random(50, 200)
+      setRandomColor()
+      ellipse(x, y, size, size)
+      fill(255)
+      text(count++, x, y)
     }
 
     function setRandomColor () {
